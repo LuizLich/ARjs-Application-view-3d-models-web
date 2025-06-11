@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Projeto RA</title>
+
+    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras/dist/aframe-extras.min.js"></script>
+
+    <style>
+      body {
+        margin: 0;
+        overflow: hidden;
+      }
+      #modelSelector, #fullscreenBtn {
+        position: absolute;
+        top: 10px;
+        z-index: 999;
+        font-size: 16px;
+        padding: 5px;
+      }
+      #modelSelector {
+        left: 10px;
+      }
+      #fullscreenBtn {
+        right: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Dropdown de seleção -->
+    <select id="modelSelector">
+      <option value="tie">TIE Fighter</option>
+      <option value="battle">Battle Scene</option>
+    </select>
+
+    <button id="fullscreenBtn">Tela Cheia</button>
+
+    <a-scene
+      embedded
+      arjs="sourceType: webcam;"
+      vr-mode-ui="enabled: false"
+      renderer="logarithmicDepthBuffer: true;"
+      id="arScene"
+    >
+      <a-light type="ambient" color="#ffffff"></a-light>
+      <a-light type="directional" color="#ffffff" intensity="0.5" position="1 1 1"></a-light>
+
+      <a-marker preset="hiro">
+        <a-gltf-model
+          id="modelViewer"
+          src="models/3d_t.i.e_fighter_-_star_wars_model.glb"
+          position="0 0 0"
+          scale="0.2 0.2 0.2"
+          rotation="0 180 0"
+        ></a-gltf-model>
+      </a-marker>
+
+      <a-entity camera></a-entity>
+    </a-scene>
+
+    <script>
+      // Configurações personalizadas por modelo
+      const modelConfigs = {
+        tie: {
+          src: "models/3d_t.i.e_fighter_-_star_wars_model.glb",
+          scale: "0.2 0.2 0.2",
+          rotation: "0 180 0",
+        },
+        battle: {
+          src: "models/star_wars_at-at_battle.glb",
+          scale: "0.05 0.05 0.05",
+          rotation: "0 0 0",
+        },
+      };
+
+      // Troca dinâmica do modelo
+      const selector = document.getElementById("modelSelector");
+      const modelViewer = document.getElementById("modelViewer");
+
+      selector.addEventListener("change", () => {
+        const selected = selector.value;
+        const config = modelConfigs[selected];
+
+        modelViewer.setAttribute("src", config.src);
+        modelViewer.setAttribute("scale", config.scale);
+        modelViewer.setAttribute("rotation", config.rotation);
+      });
+
+      const fullscreenBtn = document.getElementById("fullscreenBtn");
+      const scene = document.documentElement;
+
+      fullscreenBtn.addEventListener("click", () => {
+        if (!document.fullscreenElement) {
+          scene.requestFullscreen().catch((err) => {
+            alert(`Erro ao entrar em tela cheia: ${err.message}`);
+          });
+        } else {
+          document.exitFullscreen();
+        }
+      });
+    </script>
+  </body>
+</html>
