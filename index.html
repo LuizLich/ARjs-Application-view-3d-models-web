@@ -58,6 +58,7 @@
           position="0 0 0"
           scale="0.2 0.2 0.2"
           rotation="0 180 0"
+          drag-rotate
         ></a-gltf-model>
       </a-marker>
 
@@ -124,6 +125,42 @@
           document.exitFullscreen();
         }
       });
+
+       AFRAME.registerComponent("drag-rotate", {
+    schema: { speed: { default: 1 } },
+    init: function () {
+      this.handleMouseDown = this.handleMouseDown.bind(this);
+      this.handleMouseMove = this.handleMouseMove.bind(this);
+      this.handleMouseUp = this.handleMouseUp.bind(this);
+      this.isDragging = false;
+      this.lastX = 0;
+    },
+    play: function () {
+      this.el.sceneEl.canvas.addEventListener("mousedown", this.handleMouseDown);
+      window.addEventListener("mousemove", this.handleMouseMove);
+      window.addEventListener("mouseup", this.handleMouseUp);
+    },
+    pause: function () {
+      this.el.sceneEl.canvas.removeEventListener("mousedown", this.handleMouseDown);
+      window.removeEventListener("mousemove", this.handleMouseMove);
+      window.removeEventListener("mouseup", this.handleMouseUp);
+    },
+    handleMouseDown: function (event) {
+      this.isDragging = true;
+      this.lastX = event.clientX;
+    },
+    handleMouseMove: function (event) {
+      if (!this.isDragging) return;
+      const deltaX = event.clientX - this.lastX;
+      this.lastX = event.clientX;
+      const rotation = this.el.getAttribute("rotation");
+      rotation.y += deltaX * this.data.speed;
+      this.el.setAttribute("rotation", rotation);
+    },
+    handleMouseUp: function () {
+      this.isDragging = false;
+    },
+  });
     </script>
   </body>
 </html>
