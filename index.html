@@ -1,166 +1,223 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Projeto RA</title>
 
-    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras/dist/aframe-extras.min.js"></script>
+<head>
+  <meta charset="UTF-8" />
+  <title>Projeto RA</title>
 
-    <style>
-      body {
-        margin: 0;
-        overflow: hidden;
+  <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras/dist/aframe-extras.min.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+    }
+
+    #modelSelector,
+    #fullscreenBtn {
+      position: absolute;
+      top: 10px;
+      z-index: 999;
+      font-size: 16px;
+      padding: 5px;
+    }
+
+    #modelSelector {
+      left: 10px;
+    }
+
+    #fullscreenBtn {
+      right: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Dropdown de seleção -->
+  <select id="modelSelector">
+    <option value="tie">TIE Fighter</option>
+    <option value="battle">Battle Scene</option>
+    <option value="gojo">Gojo</option>
+    <option value="hinata">Hinata</option>
+    <option value="geto">Geto</option>
+    <option value="gojo2">Gojo Background</option>
+  </select>
+
+  <button id="fullscreenBtn">Tela Cheia</button>
+
+  <div
+    style="position: absolute; bottom: 10px; left: 10px; z-index: 999; background: rgba(0,0,0,0.5); padding: 10px; border-radius: 8px; color: white;">
+    <label>Volume do Modelo:
+      <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="1">
+    </label>
+    <button id="muteBtn">🔇</button>
+    <br><br>
+    <label>Som Ambiente:
+      <input type="range" id="bgVolumeSlider" min="0" max="1" step="0.01" value="0.5">
+    </label>
+  </div>
+
+
+  <a-scene embedded arjs="sourceType: webcam;" vr-mode-ui="enabled: false" renderer="logarithmicDepthBuffer: true;"
+    id="arScene">
+    <a-light type="ambient" color="#ffffff"></a-light>
+    <a-light type="directional" color="#ffffff" intensity="0.5" position="1 1 1"></a-light>
+
+    <a-marker preset="hiro">
+      <a-gltf-model id="modelViewer" src="models/3d_t.i.e_fighter_-_star_wars_model.glb" position="0 0 0"
+        scale="0.2 0.2 0.2" rotation="0 180 0" drag-rotate></a-gltf-model>
+
+
+      <a-sound   id="modelSound"   src="url(sounds/tie_fighter_sound.mp3)"   autoplay="true"   loop="false"  
+        position="0 2 5">
+      </a-sound>
+    </a-marker>
+
+    <a-sound id="bgSound" src="url(sounds/ambiente.mp3)" autoplay="true" loop="true" volume="0.5"
+      position="0 2 5"></a-sound>
+
+    <a-entity camera></a-entity>
+  </a-scene>
+
+  <script>
+    // Configurações personalizadas por modelo
+    const modelConfigs = {
+      tie: {
+        src: "models/3d_t.i.e_fighter_-_star_wars_model.glb",
+        scale: "0.2 0.2 0.2",
+        rotation: "0 180 0",
+        sound: ""
+      },
+      battle: {
+        src: "models/star_wars_at-at_battle.glb",
+        scale: "0.05 0.05 0.05",
+        rotation: "0 0 0",
+        sound: "sounds/starwars.mp3"
+      },
+      gojo: {
+        src: "models/gojo_jujutsu_kaisen.glb",
+        scale: "0.5 0.5 0.5",
+        rotation: "0 0 0",
+        sound: ""
+      },
+      hinata: {
+        src: "models/hinata_shoyou_-_haikyuu.glb",
+        scale: "0.1 0.1 0.1",
+        rotation: "0 90 0",
+        sound: "sounds/flyhigh.mp3"
+      },
+      gojo2: {
+        src: "models/gojo_satoru__jujutsu_kaisen_season (1).glb",
+        scale: "2.7 2.7 2.7",
+        rotation: "0 90 0",
+        sound: "sounds/special.mp3"
+      },
+      geto: {
+        src: "models/suguru_geto.glb",
+        scale: "50.5 50.5 50.5",
+        rotation: "0 0 0",
+        sound: ""
+      },
+    };
+
+    // Troca dinâmica do modelo
+    const selector = document.getElementById("modelSelector");
+    const modelViewer = document.getElementById("modelViewer");
+    const sound = document.getElementById("modelSound");
+
+    selector.addEventListener("change", () => {
+      const selected = selector.value;
+      const config = modelConfigs[selected];
+
+      modelViewer.setAttribute("src", config.src);
+      modelViewer.setAttribute("scale", config.scale);
+      modelViewer.setAttribute("rotation", config.rotation);
+
+
+      if (config.sound) {
+        sound.components.sound.stopSound(); // Para o som atual
+        sound.setAttribute("src", `url(${config.sound})`);
+        sound.components.sound.playSound(); // Toca o novo som
+      } else {
+        sound.components.sound.stopSound(); // Para o som se o novo modelo não tiver som
       }
-      #modelSelector, #fullscreenBtn {
-        position: absolute;
-        top: 10px;
-        z-index: 999;
-        font-size: 16px;
-        padding: 5px;
+
+    });
+
+    const fullscreenBtn = document.getElementById("fullscreenBtn");
+    const scene = document.documentElement;
+
+    fullscreenBtn.addEventListener("click", () => {
+      if (!document.fullscreenElement) {
+        scene.requestFullscreen().catch((err) => {
+          alert(`Erro ao entrar em tela cheia: ${err.message}`);
+        });
+      } else {
+        document.exitFullscreen();
       }
-      #modelSelector {
-        left: 10px;
-      }
-      #fullscreenBtn {
-        right: 10px;
-      }
-    </style>
-  </head>
-  <body>
-    <!-- Dropdown de seleção -->
-    <select id="modelSelector">
-      <option value="tie">TIE Fighter</option>
-      <option value="battle">Battle Scene</option>
-      <option value="gojo">Gojo</option>
-      <option value="hinata">Hinata</option>
-      <option value="geto">Geto</option>
-      <option value="gojo2">Gojo Background</option>
-    </select>
+    });
 
-    <button id="fullscreenBtn">Tela Cheia</button>
+    AFRAME.registerComponent("drag-rotate", {
+      schema: { speed: { default: 1 } },
+      init: function () {
+        this.handleMouseDown = this.handleMouseDown.bind(this);
+        this.handleMouseMove = this.handleMouseMove.bind(this);
+        this.handleMouseUp = this.handleMouseUp.bind(this);
+        this.isDragging = false;
+        this.lastX = 0;
+      },
+      play: function () {
+        this.el.sceneEl.canvas.addEventListener("mousedown", this.handleMouseDown);
+        window.addEventListener("mousemove", this.handleMouseMove);
+        window.addEventListener("mouseup", this.handleMouseUp);
+      },
+      pause: function () {
+        this.el.sceneEl.canvas.removeEventListener("mousedown", this.handleMouseDown);
+        window.removeEventListener("mousemove", this.handleMouseMove);
+        window.removeEventListener("mouseup", this.handleMouseUp);
+      },
+      handleMouseDown: function (event) {
+        this.isDragging = true;
+        this.lastX = event.clientX;
+      },
+      handleMouseMove: function (event) {
+        if (!this.isDragging) return;
+        const deltaX = event.clientX - this.lastX;
+        this.lastX = event.clientX;
+        const rotation = this.el.getAttribute("rotation");
+        rotation.y += deltaX * this.data.speed;
+        this.el.setAttribute("rotation", rotation);
+      },
+      handleMouseUp: function () {
+        this.isDragging = false;
+      },
+    });
 
-    <a-scene
-      embedded
-      arjs="sourceType: webcam;"
-      vr-mode-ui="enabled: false"
-      renderer="logarithmicDepthBuffer: true;"
-      id="arScene"
-    >
-      <a-light type="ambient" color="#ffffff"></a-light>
-      <a-light type="directional" color="#ffffff" intensity="0.5" position="1 1 1"></a-light>
+    const volumeSlider = document.getElementById("volumeSlider");
+    const muteBtn = document.getElementById("muteBtn");
+    const bgVolumeSlider = document.getElementById("bgVolumeSlider");
+    const bgSound = document.getElementById("bgSound");
 
-      <a-marker preset="hiro">
-        <a-gltf-model
-          id="modelViewer"
-          src="models/3d_t.i.e_fighter_-_star_wars_model.glb"
-          position="0 0 0"
-          scale="0.2 0.2 0.2"
-          rotation="0 180 0"
-          drag-rotate
-        ></a-gltf-model>
-      </a-marker>
+    let isMuted = false;
 
-      <a-entity camera></a-entity>
-    </a-scene>
+    volumeSlider.addEventListener("input", () => {
+      sound.setAttribute("volume", volumeSlider.value);
+    });
 
-    <script>
-      // Configurações personalizadas por modelo
-      const modelConfigs = {
-        tie: {
-          src: "models/3d_t.i.e_fighter_-_star_wars_model.glb",
-          scale: "0.2 0.2 0.2",
-          rotation: "0 180 0",
-        },
-        battle: {
-          src: "models/star_wars_at-at_battle.glb",
-          scale: "0.05 0.05 0.05",
-          rotation: "0 0 0",
-        },
-        gojo: {
-          src: "models/gojo_jujutsu_kaisen.glb",
-          scale: "0.5 0.5 0.5",
-          rotation: "0 0 0",
-        },
-        hinata: {
-          src: "models/hinata_shoyou_-_haikyuu.glb",
-          scale: "0.7 0.7 0.7",
-          rotation: "0 0 0",
-        },
-        gojo2: {
-          src: "models/gojo_satoru__jujutsu_kaisen_season (1).glb",
-          scale: "2.7 2.7 2.7",
-          rotation: "0 0 0",
-        },
-        geto: {
-          src: "models/suguru_geto.glb",
-          scale: "50.5 50.5 50.5",
-          rotation: "0 0 0",
-        },
-      };
+    bgVolumeSlider.addEventListener("input", () => {
+      bgSound.setAttribute("volume", bgVolumeSlider.value);
+    });
 
-      // Troca dinâmica do modelo
-      const selector = document.getElementById("modelSelector");
-      const modelViewer = document.getElementById("modelViewer");
+    muteBtn.addEventListener("click", () => {
+      isMuted = !isMuted;
+      const newVolume = isMuted ? 0 : volumeSlider.value;
+      sound.setAttribute("volume", newVolume);
+      muteBtn.textContent = isMuted ? "🔇" : "🔈";
+    });
 
-      selector.addEventListener("change", () => {
-        const selected = selector.value;
-        const config = modelConfigs[selected];
+  </script>
+</body>
 
-        modelViewer.setAttribute("src", config.src);
-        modelViewer.setAttribute("scale", config.scale);
-        modelViewer.setAttribute("rotation", config.rotation);
-      });
-
-      const fullscreenBtn = document.getElementById("fullscreenBtn");
-      const scene = document.documentElement;
-
-      fullscreenBtn.addEventListener("click", () => {
-        if (!document.fullscreenElement) {
-          scene.requestFullscreen().catch((err) => {
-            alert(`Erro ao entrar em tela cheia: ${err.message}`);
-          });
-        } else {
-          document.exitFullscreen();
-        }
-      });
-
-       AFRAME.registerComponent("drag-rotate", {
-    schema: { speed: { default: 1 } },
-    init: function () {
-      this.handleMouseDown = this.handleMouseDown.bind(this);
-      this.handleMouseMove = this.handleMouseMove.bind(this);
-      this.handleMouseUp = this.handleMouseUp.bind(this);
-      this.isDragging = false;
-      this.lastX = 0;
-    },
-    play: function () {
-      this.el.sceneEl.canvas.addEventListener("mousedown", this.handleMouseDown);
-      window.addEventListener("mousemove", this.handleMouseMove);
-      window.addEventListener("mouseup", this.handleMouseUp);
-    },
-    pause: function () {
-      this.el.sceneEl.canvas.removeEventListener("mousedown", this.handleMouseDown);
-      window.removeEventListener("mousemove", this.handleMouseMove);
-      window.removeEventListener("mouseup", this.handleMouseUp);
-    },
-    handleMouseDown: function (event) {
-      this.isDragging = true;
-      this.lastX = event.clientX;
-    },
-    handleMouseMove: function (event) {
-      if (!this.isDragging) return;
-      const deltaX = event.clientX - this.lastX;
-      this.lastX = event.clientX;
-      const rotation = this.el.getAttribute("rotation");
-      rotation.y += deltaX * this.data.speed;
-      this.el.setAttribute("rotation", rotation);
-    },
-    handleMouseUp: function () {
-      this.isDragging = false;
-    },
-  });
-    </script>
-  </body>
 </html>
