@@ -9,6 +9,16 @@ This project utilizes the AR.js, A-Frame, and A-Frame Extras libraries for visua
 - Switch between available models using a dropdown
 - Fullscreen mode
 - Customizable code available
+- Custom volume control and mute toggle for model and ambient sounds
+
+## 🎵 Model Sounds
+
+Each 3D model can now include a unique sound that plays automatically when the model is loaded.
+This allows for a more immersive and engaging AR experience. You can control:
+
+- The volume of the model’s sound individually
+- The ambient background sound, which loops continuously
+- Toggle mute/unmute via a simple interface
 
 ## 🧠How to Use
 
@@ -51,6 +61,7 @@ This project is based on the reference implementations from AR.js-org. While it 
 -   **User interface elements**: Custom dropdowns or buttons for model selection and fullscreen toggling.
 -   **Performance optimizations**: Any specific techniques applied to improve rendering performance or reduce latency.
 -   **Custom A-Frame components**: Development of unique A-Frame components to extend functionality beyond the standard offerings of A-Frame Extras.
+-   **Audio control integration**: Model-specific and ambient sounds with independent controls.
 
 For detailed insights into the implementation, it is recommended to review the source code, particularly `index.html` and any associated JavaScript files.
 
