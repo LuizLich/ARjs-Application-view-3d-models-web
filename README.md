@@ -18,7 +18,7 @@ To use this application, you will need:
 
 - A web browser with camera access (e.g., Chrome, Firefox, Safari)
 - An internet connection to load the necessary libraries and models
-- The HIRO marker image, which can be found in the repository or downloaded [here](https://raw.githubusercontent.com/AR-js-org/AR.js/master/data/images/HIRO.png).
+- The HIRO marker image, which can be found in the repository or downloaded [here](https://raw.githubusercontent.com/LuizLich/ARjs-Application-view-3d-models-web/refs/heads/main/HIRO.jpg).
 
 ### 🔳Other 3D Models from Sketchfab
 
